@@ -10,7 +10,7 @@ if DEBUG:
                  rank_1_skill_info={"name": "Up and Away", "type": "all heal"})
 
     Hero2 = Hero("Sludge", 1000, 250, level=1, base_attack_stat=2,
-                 rank_2_skill_info={"name": "Downrise", "type": "self heal"},
+                 rank_2_skill_info={"name": "Air Bound", "type": "self shield"},
                  rank_1_skill_info={"name": "Shatter", "type": "all damage"})
     Hero3 = Hero("Froggladior", 1500, 350, level=1,
                  rank_2_skill_info={"name": "Downfall", "type": "self heal"},
@@ -21,14 +21,15 @@ if DEBUG:
 
     Hero1.energy += 10000
     Hero2.energy += 10000
-    enemy1 = Hero("asdf", 1500, 200, level=1, rank_2_skill_info={"name": "Downfall", "type": "damage"})
+    enemy1 = Hero("asdf", 10, 200, level=1, rank_2_skill_info={"name": "Downfall", "type": "damage"})
 
-    enemy2 = Hero("ddge", 1050, 150, level=1, base_attack_stat=2,
+    enemy2 = Hero("ddge", 10, 150, level=1, base_attack_stat=2,
                   rank_2_skill_info={"name": "Flower of the Earth", "type": "self heal"})
-    enemy3 = Hero("sge", 5000, 150, level=1, base_attack_stat=2,
+    enemy3 = Hero("sge", 50, 150, level=1, base_attack_stat=2,
                   rank_2_skill_info={"name": "Flower of the Earth", "type": "self heal"})
     h = [Hero1, Hero2, Hero3, Hero4]
     e = [enemy1, enemy2, enemy3]
+
 
 
 def battle_over_class(hero_list, enemy_list):
@@ -40,8 +41,9 @@ def battle_over_class(hero_list, enemy_list):
         return 0
 
 
+
 def full_battle_over_check(enemy_list1=None, enemy_list2=None, enemy_list3=None):
-    l = [enemy_list for enemy_list in [enemy_list1, enemy_list2, enemy_list3] is not None]
+    l = [enemy_list for enemy_list in [enemy_list1, enemy_list2, enemy_list3] if enemy_list is not None]
     t = []
     for li in l:
         if all(enemy.permissions == "dead" for enemy in li):
@@ -54,14 +56,17 @@ def full_battle_over_check(enemy_list1=None, enemy_list2=None, enemy_list3=None)
         print("You lose.")
 
 
+
+
+
 class Battle:
     def __init__(self, watchers, enemies, round=False):
         self.watchers = watchers
         self.enemies = enemies
         self.round = False
-        if isinstance(self.watchers, list) and len(self.watchers) > 0:
+        if isinstance(self.watchers, list) and len(self.watchers) == 0:
             raise InitError("Watcher List Empty", Battle)
-        if isinstance(self.enemies, list) and len(self.enemies) > 0:
+        if isinstance(self.enemies, list) and len(self.enemies) == 0:
             raise InitError("Enemy List Empty", Battle)
 
     def list_check(self):
@@ -114,7 +119,10 @@ class Battle:
                             for index, enemy in enumerate(self.enemies, start=1):
                                 if enemy.health > 0:
                                     wait(0.5)
-                                    print(f"({index}): {enemy.name}")
+                                    if enemy.shield > 0:
+                                        print(f"({index}): {enemy.name} [SHIELDED]")
+                                    else:
+                                        print(f"({index}): {enemy.name}")
                                 else:
                                     continue
                             hero.enemy_decision = input("Choice: ")
@@ -124,7 +132,6 @@ class Battle:
                                         self.enemies) and not self.enemies[int(hero.enemy_decision) - 1].health <= 0:
                                     hero.base_attack(self.enemies[int(hero.enemy_decision) - 1])
                                     moved += 1
-                                    continue
                                 else:
                                     hero.enemy_decision = ""
                                     print("Retry. Unknown String Typed")
@@ -137,9 +144,13 @@ class Battle:
                             type = hero.rank_2_skill_info["type"]
                             if hero.energy >= 20:
                                 if type == "sing. damage":
-                                    for index, enemy in enumerate(self.enemies):
-                                        if enemy is not None and not (enemy.health <= 0):
-                                            print(f"({index + 1}): {enemy.name}")
+                                    for index, enemy in enumerate(self.enemies, start=1):
+                                        if enemy.health > 0:
+                                            wait(0.5)
+                                            if enemy.shield > 0:
+                                                print(f"({index}): {enemy.name} [SHIELDED]")
+                                            else:
+                                                print(f"({index}): {enemy.name}")
                                         else:
                                             continue
                                     hero.enemy_decision = input("Choose: ")
