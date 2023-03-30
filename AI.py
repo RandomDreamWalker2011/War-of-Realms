@@ -35,43 +35,6 @@ class AI:
         self.least_health = []
         self.most_energy = []
         self.most_health = []
-from heros import Hero
-from random import choice
-
-
-class AI:
-    healers = []
-    least_energy = []
-    least_health = []
-    most_energy = []
-    most_health = []
-
-    def __init__(self, enemies, watcher, allies):
-        self.enemies = enemies
-        self.allies = allies
-        self.hero = watcher
-
-    def get_healers(self):
-        self.healers = [enemy for enemy in self.enemies if enemy.rank_2_skill_info['type'] == "self heal"]
-
-    def get_energy(self):
-        if len(self.enemies) >= 3:
-            self.least_energy = sorted(self.enemies, key=lambda x: x.energy)[:2]
-            self.most_energy = sorted(self.enemies, key=lambda x: x.energy)[2:]
-        else:
-            self.least_energy = self.enemies
-            self.most_energy = self.enemies
-
-    def get_health(self):
-        self.least_health = sorted(self.enemies, key=lambda x: x.health)[:3]
-        self.most_health = sorted(self.enemies, key=lambda x: x.health)[3:]
-
-    def reset(self):
-        self.healers = []
-        self.least_energy = []
-        self.least_health = []
-        self.most_energy = []
-        self.most_health = []
 
     def decide(self):
         targets = []
@@ -115,13 +78,11 @@ class AI:
                 self.hero.base_attack(target)
             return
         else:
-            if self.hero.health < choice(self.enemies).attack and self.hero.rank_2_skill_info[
-                "type"] == "self heal" and self.hero.energy >= 20:
+            if self.hero.health < choice(self.enemies).attack \
+                    and (self.hero.rank_2_skill_info["type"] == "self heal" or self.hero.rank_2_skill_info == "self shield") \
+                    and self.hero.energy >= 20:
                 self.hero.rank_2_skill(choice([t[0] for t in targets]))
                 return
-            elif self.hero.rank_2_skill_info['type'] == "self shield" and self.hero.energy >=20:
-                self.hero.rank_2_skill()
-
             else:
                 kills_that_can_getaway = []
                 for target, reason in targets:
@@ -133,3 +94,4 @@ class AI:
                 except IndexError:
                     print("")
                 self.hero.base_attack(target)
+
