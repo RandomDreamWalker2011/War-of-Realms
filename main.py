@@ -70,5 +70,5 @@ for char in Ghalad4:
     sleep(0.01)
 input()
 
-
+print("LOL LOL LOL!! DEMO OVER XD! (THIS ISN't EVEN A DEMO LOL)")
 
