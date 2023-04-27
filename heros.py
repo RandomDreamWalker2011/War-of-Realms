@@ -10,29 +10,41 @@ heroes_list = []
 
 
 class Hero:
+    """
+        For Battles and Characters the Player Controls
+    """
+
     permissions = "living"
-    ATTACK_STATS = ["physical", "magic", "pure"]
+    ATTACK_STATS = ["demonic", "magic", "pure", "elemental", "normal"]
+    # Different Attack Stats for shields and crits.
     energy = 0
     decision = ""
     enemy_decision = ""
+    crit_chance = 10
 
-    def __init__(self, name, health, attack, level=1, base_attack_stat=0,
+    def __init__(self, name, health, attack, defence=None, level=1, base_attack_stat=0,
                  rank_2_skill_info: dict = False, rank_1_skill_info: dict = False, AI=False):
         self.name = name
         self.max_health = health
         self.health = health
         self.attack = attack
+        self.defence = defence
         self.level = level
         self.base_attack_stat = self.ATTACK_STATS[base_attack_stat]
         self.rank_2_skill_info = rank_2_skill_info
         self.rank_1_skill_info = rank_1_skill_info
         self.AI = AI
         self.shield = 0
+        self.exp = 0
+        self.limit = 50
         if self.max_health <= 0:
             raise InitError(f"Health/MaxHealth is 0 or less in Hero {name}", Hero)
 
     def __str__(self):
         return f"{self.name}, {self.permissions}, {self.health}"
+
+    def damage_calculator(self, enemy):
+        pass
 
     def base_attack(self, enemy, ally=None):
         if self.permissions == "dead":
@@ -48,13 +60,13 @@ class Hero:
             if enemy.shield > 0:
                 enemy.shield -= self.attack
                 if enemy.shield < 0:
-                    print(f"{self.name} broke through {enemy.name}'s shield! {-enemy.shield} was dealt to {enemy.name}!")
-                    enemy.health + enemy.shield
+                    print(
+                        f"{self.name} broke through {enemy.name}'s shield! {-enemy.shield - enemy.defense} was dealt to {enemy.name}!")
                     if enemy.health <= 0:
                         print(f"{enemy.name} was killed!")
                     enemy.shield = 0
                     enemy.permissions = "dead"
-                    enemy.health = 0;
+                    enemy.health = 0
                     return
                 elif enemy.shield == 0:
                     print(f"{self.name} managed to break {enemy.name}'s shield, but dealt no damage to {enemy.name}.")
@@ -63,7 +75,6 @@ class Hero:
                     print(f"{self.name} failed to break through {enemy.name}'s shield! {enemy.name}'s shield can "
                           f"still stand {enemy.shield} left.")
                     return
-
 
             if (enemy.health - self.attack) <= 0:
                 print(f"{self.name} dealt {self.attack} {self.base_attack_stat} damage to {enemy.name}! \n \
@@ -139,7 +150,8 @@ class Hero:
                                 a.health = a.max_health
                             else:
                                 a.health += (self.attack + 500)
-                                print(f"{a.name} got healed by {self.attack + 500}! {a.name}'s health is now at {a.health}")
+                                print(
+                                    f"{a.name} got healed by {self.attack + 500}! {a.name}'s health is now at {a.health}")
                 else:
                     raise InputNotFoundError(f"Allies not found in rank 1 skill of Hero {self.name}")
             else:
@@ -170,8 +182,9 @@ class Hero:
                             f"{self.name} managed to break {enemy.name}'s shield using the green skill {self.rank_2_skill_info['name']}, but dealt no damage to {enemy.name}.")
                         return
                     else:
-                        print(f"{self.name} failed to break through {enemy.name}'s shield using the green skill {self.rank_2_skill_info['name']}! {enemy.name}'s shield can "
-                              f"still stand {enemy.shield} left.")
+                        print(
+                            f"{self.name} failed to break through {enemy.name}'s shield using the green skill {self.rank_2_skill_info['name']}! {enemy.name}'s shield can "
+                            f"still stand {enemy.shield} left.")
                         return
 
                 if (enemy.health - (self.attack + 300)) < 0:
@@ -209,10 +222,23 @@ class Hero:
         else:
             print(f"{self.name} Does Not Enough Energy")
 
+    def rank_3_skill(self, enemy=None):
+        pass
+
+    def rank_4_skill(self):
+        pass
+
+    def special_passive(self):
+        pass
+
     def reset(self):
         self.permissions = "living"
         self.health = self.max_health
         self.energy = 0
+
+
+class Monster(Hero):
+    pass
 
 
 # testing_initerror = Hero("h", 0, 50)
