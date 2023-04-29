@@ -1,3 +1,7 @@
+"""
+    Main Battle System
+"""
+
 from heros import *
 from time import sleep as wait
 from AI import AI
@@ -29,7 +33,9 @@ if DEBUG:
                   rank_2_skill_info={"name": "Flower of the Earth", "type": "self heal"})
     h = [Hero1, Hero2, Hero3, Hero4]
     e = [enemy1, enemy2, enemy3]
-
+    e1 = [enemy1]
+    e2 = [enemy2]
+    e3 = [enemy3]
 
 
 def battle_over_class(hero_list, enemy_list):
@@ -41,29 +47,70 @@ def battle_over_class(hero_list, enemy_list):
         return 0
 
 
-
-def full_battle_over_check(enemy_list1=None, enemy_list2=None, enemy_list3=None):
-    l = [enemy_list for enemy_list in [enemy_list1, enemy_list2, enemy_list3] if enemy_list is not None]
+def full_battle_over_check(enemy_list, heros, round=None, round_max = None):
     t = []
-    for li in l:
-        if all(enemy.permissions == "dead" for enemy in li):
+    for li in enemy_list:
+        if all(enemy.permissions == "dead" for enemy in enemy_list):
             t.append(True)
         else:
             t.append(False)
-    if all(t):
-        print("You won!")
+    if round is None:
+        if all(t):
+            print("You won!")
+            wait(1)
+            for hero in heros:
+                hero.exp += 100
+                print(f"{hero.name} got 100 exp!")
+                wait(0.5)
+                while True:
+                    if hero.exp >= hero.limit:
+                        hero.level += 1
+                        hero.exp -= hero.limit
+                        hero.limit = round(hero.limit * 1.75)
+                        wait(0.5)
+                        print(f"{hero.name} leveled up to level {hero.level}! {hero.exp} left!")
+                    else:
+                        break
+        else:
+            print("You lose.")
     else:
-        print("You lose.")
-
-
-
+        if round_max is None:
+            print("ERROR: ROUND MAX NOT DEFINED")
+            return
+        if all(t):
+            print(f"You won round {round}!")
+            wait(0.5)
+            if round < round_max:
+                print(f"{round_max - round} round(s) left.")
+                return 3 - round
+            elif round <= 0 or round >= round_max:
+                raise InvalidInputError("Round Number Invalid")
+            else:
+                print("You Win!")
+                wait(1)
+                for hero in heros:
+                    hero.exp += 100
+                    print(f"{hero.name} got 100 exp!")
+                    wait(0.5)
+                    while True:
+                        if hero.exp >= hero.limit:
+                            hero.level += 1
+                            hero.exp -= hero.limit
+                            hero.limit = round(hero.limit * 1.75)
+                            wait(0.5)
+                            print(f"{hero.name} leveled up to level {hero.level}! {hero.exp} left!")
+                        else:
+                            break
+        else:
+            print("You lose.")
 
 
 class Battle:
-    def __init__(self, watchers, enemies, round=False):
+    def __init__(self, watchers, enemies, round=False, round_max = None):
         self.watchers = watchers
         self.enemies = enemies
-        self.round = False
+        self.round = round
+        self.round_max = round_max
         if isinstance(self.watchers, list) and len(self.watchers) == 0:
             raise InitError("Watcher List Empty", Battle)
         if isinstance(self.enemies, list) and len(self.enemies) == 0:
@@ -214,7 +261,8 @@ class Battle:
                     MAIN_AI.decide()
                     over = battle_over_class(self.watchers, self.enemies)
 
-        full_battle_over_check(enemy_list1=self.enemies)
+        full_battle_over_check(self.enemies, self.watchers, self.round, self.round_max)
+        print("hi")
 
     def reset(self):
         for hero in self.watchers:
@@ -224,14 +272,13 @@ class Battle:
 
 
 def standard_battle(heros, enemy_set1, enemy_set2, enemy_set3):
-    battle = Battle(heros, enemy_set1)
+    battle = Battle(heros, enemy_set1, round = 1, round_max = 3)
     battle.battle()
     battle.enemies = enemy_set2
     battle.battle()
     battle.enemies = enemy_set3
     battle.battle()
     battle.reset()
-    full_battle_over_check(enemy_set1, enemy_set2, enemy_set3)
 
 
 def sing_round_battle(heros, enemies):
@@ -240,6 +287,10 @@ def sing_round_battle(heros, enemies):
     battle.reset()
 
 
-stuff = 0
-if stuff == 1:
-    sing_round_battle(h, e)
+
+if __name__ == "__main__":
+    stuff = 2
+    if stuff == 1:
+        sing_round_battle(h, e)
+    elif stuff == 2:
+        standard_battle(h, e1, e2, e3)
