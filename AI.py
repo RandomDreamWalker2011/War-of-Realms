@@ -1,4 +1,4 @@
-from heros import Hero
+from heros import Hero  # Just there to prove something
 from random import choice
 
 
@@ -53,7 +53,7 @@ class AI:
                     enemy in self.least_health):
                 targets.append((enemy, "KILL"))
 
-        if (self.hero.energy >= 150) and (self.hero.rank_1_skill_info["type"] == "all damage"):
+        if (self.hero.energy >= 150) and (self.hero.rank_2_skill_info["type"] == "all damage"):
             # get all enemies that can be killed using rank_1_skill
             targets += [(e, "KILL") for e in self.enemies if e.health <= (self.hero.attack + 500)]
             if targets:
@@ -79,7 +79,8 @@ class AI:
             return
         else:
             if self.hero.health < choice(self.enemies).attack \
-                    and (self.hero.rank_2_skill_info["type"] == "self heal" or self.hero.rank_2_skill_info == "self shield") \
+                    and (
+                    self.hero.rank_2_skill_info["type"] == "self heal" or self.hero.rank_2_skill_info == "self shield") \
                     and self.hero.energy >= 20:
                 self.hero.rank_2_skill(choice([t[0] for t in targets]))
                 return
@@ -94,4 +95,3 @@ class AI:
                 except IndexError:
                     print("")
                 self.hero.base_attack(target)
-
