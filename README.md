@@ -1,2 +1,2 @@
-# War-of-Realms
+# Wishing Star
 Small project.
